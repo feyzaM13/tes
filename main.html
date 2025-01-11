@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 24.8.3.2 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-family: "Noto Sans Mono CJK SC", monospace; font-size: 10pt }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre class="western">#include &lt;iostream&gt;
+#include &lt;unordered_map&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+// Struktur untuk menyimpan informasi ternak
+struct Ternak {
+  string spesies;
+  string warna;
+  string umur;
+  bool isAvailable;
+};
+
+// Struktur untuk menyimpan informasi pemilik
+struct Pemilik {
+  string nama;
+  string alamat;
+};
+
+// Struktur untuk menyimpan informasi transaksi
+struct Transaksi {
+  string nama;
+  string alamat;
+  string tanggal;
+};
+
+class Livestock {
+private:
+  vector&lt;Ternak&gt; ternaks;
+  unordered_map&lt;string, Pemilik&gt; pemiliks;
+  vector&lt;Transaksi&gt; transaksis;
+
+public:
+  // Menambahkan ternak ke livestock
+  void addTernak(string spesies, string warna, string umur) {
+    ternaks.push_back({spesies, warna, umur, true});
+  }
+
+  // Menambahkan pemilik ke sistem
+  void addPemilik(string nama, string alamat) {
+    pemiliks[nama] = {nama, alamat};
+  }
+
+  // Memeriksa ketersediaan ternak
+  bool checkAvailability(string spesies) {
+    for (auto &amp;ternak : ternaks) {
+      if (ternak.spesies == spesies &amp;&amp; ternak.isAvailable) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Menjual ternak
+  string sellTernak(string spesies, string nama, string tanggal) {
+    if (checkAvailability(spesies)) {
+      for (auto &amp;ternak : ternaks) {
+        if (ternak.spesies == spesies) {
+          ternak.isAvailable = false;
+          transaksis.push_back({spesies, nama, tanggal});
+          return &quot;Penjualan berhasil&quot;;
+        }
+      }
+    }
+    return &quot;Ternak tidak tersedia&quot;;
+  }
+
+  // Membeli ternak
+  string buyTernak(string spesies, string nama, string tanggal) {
+    for (auto &amp;ternak : ternaks) {
+      if (ternak.spesies == spesies &amp;&amp; !ternak.isAvailable) {
+        ternak.isAvailable = true;
+        transaksis.push_back({spesies, nama, tanggal});
+        return &quot;Pembelian berhasil&quot;;
+      }
+    }
+    return &quot;Pembelian gagal&quot;;
+  }
+
+  // Menampilkan semua ternak
+  void displayTernaks() {
+    for (auto &amp;ternak : ternaks) {
+      cout &lt;&lt; &quot;Spesies: &quot; &lt;&lt; ternak.spesies &lt;&lt; &quot;, Warna: &quot; &lt;&lt; ternak.warna
+           &lt;&lt; &quot;, Umur: &quot; &lt;&lt; ternak.umur
+           &lt;&lt; &quot;, Tersedia: &quot; &lt;&lt; (ternak.isAvailable ? &quot;Ya&quot; : &quot;Tidak&quot;) &lt;&lt; endl;
+    }
+  }
+};
+
+int main() {
+  Livestock livestock;
+  int choice;
+  string spesies, warna, umur, nama, alamat, tanggal;
+
+  while (true) {
+    cout &lt;&lt; &quot;\nMenu: &quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;1. Tambah Ternak&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;2. Tambah Pemilik&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;3. Jual Ternak&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;4. Beli Ternak&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;5. Tampilkan Semua Ternak&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;6. Keluar&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;Pilih opsi: &quot;;
+    cin &gt;&gt; choice;
+
+    switch (choice) {
+    case 1:
+      cout &lt;&lt; &quot;Masukkan spesies: &quot;;
+      cin &gt;&gt; spesies;
+      cout &lt;&lt; &quot;Masukkan warna: &quot;;
+      cin.ignore();
+      getline(cin, warna);
+      cout &lt;&lt; &quot;Masukkan umur: &quot;;
+      getline(cin, umur);
+      livestock.addTernak(spesies, warna, umur);
+      break;
+
+    case 2:
+      cout &lt;&lt; &quot;Masukkan nama: &quot;;
+      cin &gt;&gt; nama;
+      cout &lt;&lt; &quot;Masukkan alamat: &quot;;
+      cin.ignore();
+      getline(cin, alamat);
+      livestock.addPemilik(nama, alamat);
+      break;
+
+    case 3:
+      cout &lt;&lt; &quot;Masukkan Spesies: &quot;;
+      cin &gt;&gt; spesies;
+      cout &lt;&lt; &quot;Masukkan Nama: &quot;;
+      cin &gt;&gt; nama;
+      cout &lt;&lt; &quot;Masukkan Tanggal Penjualan (YYYY-MM-DD): &quot;;
+      cin &gt;&gt; tanggal;
+      cout &lt;&lt; livestock.sellTernak(spesies, nama, tanggal) &lt;&lt; endl;
+      break;
+
+    case 4:
+      cout &lt;&lt; &quot;Masukkan Spesies: &quot;;
+      cin &gt;&gt; spesies;
+      cout &lt;&lt; &quot;Masukkan Nama: &quot;;
+      cin &gt;&gt; nama;
+      cout &lt;&lt; &quot;Masukkan Tanggal Pembelian (YYYY-MM-DD): &quot;;
+      cin &gt;&gt; tanggal;
+      cout &lt;&lt; livestock.buyTernak(spesies, nama, tanggal) &lt;&lt; endl;
+      break;
+
+    case 5:
+      livestock.displayTernaks();
+      break;
+
+    case 6:
+      return 0;
+
+    default:
+      cout &lt;&lt; &quot;Opsi tidak valid!&quot; &lt;&lt; endl;
+    }
+  }
+
+  return 0;
+}</pre>
+</body>
+</html>
